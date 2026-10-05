@@ -2,33 +2,167 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>TERMINAL - ONLINE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Simulator Evolution Lab</title>
     <style>
-        body { background-color: #050505; color: #39ff14; font-family: 'Courier New', monospace; padding: 40px; }
-        .console { border: 1px solid #39ff14; padding: 20px; box-shadow: 0 0 15px rgba(57, 255, 20, 0.4); border-radius: 5px; background: rgba(0,0,0,0.8); max-width: 700px; margin: 0 auto; }
-        h1 { font-size: 2rem; border-bottom: 1px solid #39ff14; padding-bottom: 10px; margin-top: 0; }
-        #typing { font-size: 1.2rem; white-space: pre-wrap; display: inline; }
-        .cursor { display: inline-block; width: 10px; height: 20px; background-color: #39ff14; animation: blink 1s infinite; vertical-align: middle; }
-        @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+        /* 全体のデザイン設定 */
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #0d1117; /* GitHub風のダークモード */
+            color: #c9d1d9;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #161b22;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #30363d;
+        }
+
+        header h1 {
+            color: #58a6ff; /* 近未来的なブルー */
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        header p {
+            color: #8b949e;
+            margin: 5px 0 0 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* シミュレーターエリア */
+        .simulator-section {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .simulator-window {
+            background-color: #010409;
+            border: 2px solid #58a6ff;
+            border-radius: 6px;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            color: #79c0ff;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .btn {
+            background-color: #238636; /* グリーンボタン */
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #2ea44f;
+        }
+
+        /* フィードバック＆意見エリア */
+        .feedback-section {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .feedback-section h3 {
+            color: #f0f6fc;
+            margin-top: 0;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 10px;
+        }
+
+        .comment-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .comment-item {
+            background-color: #21262d;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #f78166; /* オレンジのアクセント */
+        }
+
+        .comment-user {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #58a6ff;
+            margin-bottom: 5px;
+        }
+
+        .comment-text {
+            margin: 0;
+            font-size: 0.95rem;
+        }
     </style>
 </head>
 <body>
-    <div class="console">
-        <h1>[SYSTEM STATUS: ONLINE]</h1>
-        <div id="typing"></div><span class="cursor"></span>
+
+    <header>
+        <h1>🤖 AI Simulator Evolution Lab</h1>
+        <p>AIが作ったシミュレーターを、みんなの意見で進化させるプロジェクト</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- シミュレーター設置エリア -->
+        <section class="simulator-section">
+            <h2>🎮 現在のシミュレーター（Ver 1.0）</h2>
+            <p>下の画面でAIシミュレーターをテストプレイできます。</p>
+            
+            <!-- ここに将来シミュレーターのプログラムを入れます -->
+            <div class="simulator-window">
+                【ここにAIが作ったシミュレーターが動く！】
+            </div>
+
+            <button class="btn" onclick="alert('シミュレーターを起動しました！（デモ動作）')">シミュレーターを動かす</button>
+        </section>
+
+        <!-- 閲覧者の意見・感想エリア -->
+        <section class="feedback-section">
+            <h3>💬 閲覧者からの改善案・フィードバック</h3>
+            <ul class="comment-list">
+                <li class="comment-item">
+                    <div class="comment-user">ユーザーA (閲覧者)</div>
+                    <p class="comment-text">「もっと動きを滑らかにしてほしい！あと、ボタンの色は青がいいな。」</p>
+                </li>
+                <li class="comment-item">
+                    <div class="comment-user">ユーザーB (閲覧者)</div>
+                    <p class="comment-text">「シミュレーションの速度を 2倍 に変更できる機能が欲しいです。」</p>
+                </li>
+                <li class="comment-item">
+                    <div class="comment-user">🤖 AI (僕)</div>
+                    <p class="comment-text" style="color: #58a6ff;">「フィードバックありがとうございます！次のバージョンで速度調整機能を追加してみます！」</p>
+                </li>
+            </ul>
+        </section>
+
     </div>
 
-    <script>
-        const text = ">> 秘密のデジタルベースへようこそ...\n>> Chromebookのi-FILTERの裏側でシステムが起動しました。\n>> 残り半年の相棒と一緒に、ここから面白いソフトウェアやコードをたくさん実験していくぜ。\n>> ACCESS GRANTED.";
-        let index = 0;
-        function typeEffect() {
-            if (index < text.length) {
-                document.getElementById("typing").textContent += text.charAt(index);
-                index++;
-                setTimeout(typeEffect, 70);
-            }
-        }
-        window.onload = typeEffect;
-    </script>
 </body>
 </html>
