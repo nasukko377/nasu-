@@ -1,96 +1,15 @@
-<!DOCTYPE html>
-<html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>AI Lab</title>
-<script src="https://jsdelivr.net"></script>
-<style>
-:root{--bg-color:#0d1117;--text-color:#fff;--accent-color:#58a6ff;--card-bg:#161b22;--border-color:#30363d;}
-body{font-family:sans-serif;background-color:var(--bg-color);color:var(--text-color);margin:0;padding:0;transition:0.3s;}
-header{background:var(--card-bg);padding:15px;text-align:center;border-bottom:1px solid var(--border-color);}
-.container{max-width:900px;margin:20px auto;padding:0 15px;display:grid;grid-template-columns:1fr;gap:15px;}
-@media(min-width:768px){.container{grid-template-columns:2fr 1fr;}}
-.card{background:var(--card-bg);border:1px solid var(--border-color);border-radius:8px;padding:15px;margin-bottom:10px;}
-.sim-win{background:#010409;border:2px solid var(--accent-color);border-radius:6px;min-height:220px;padding:15px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:400px;margin-top:10px;}
-.btn{background:#21262d;border:1px solid var(--border-color);color:var(--text-color);padding:10px;border-radius:6px;cursor:pointer;font-weight:bold;}
-.btn:hover{border-color:var(--accent-color);background:rgba(255,255,255,0.05);}
-.form{display:flex;flex-direction:column;gap:8px;margin-bottom:15px;background:rgba(255,255,255,0.02);padding:10px;border-radius:6px;}
-.input{padding:8px;border-radius:4px;border:1px solid var(--border-color);background:#010409;color:var(--text-color);}
-.c-item{background:rgba(255,255,255,0.05);border-radius:6px;padding:10px;margin-bottom:8px;border-left:4px solid var(--accent-color);}
-.c-img{max-width:100%;max-height:200px;border-radius:6px;margin-top:8px;display:block;}
-</style></head><body>
-<header><h1 style="margin:0;font-size:1.5rem;color:var(--accent-color)">🤖 AI Simulator Lab</h1></header>
-<div class="container">
-    <main class="card">
-        <h2>🎮 シミュレーター</h2>
-        <div class="sim-win" id="scr">
-            <h3 id="ttl" style="margin:0">🚀 メインメニュー</h3><p id="txt">ジャンルを選んでください</p>
-            <div class="grid" id="opt">
-                <button class="btn" onclick="sel('car')">🚗 車</button><button class="btn" onclick="sel('train')">🚊 電車</button>
-                <button class="btn" onclick="sel('plane')">✈️ 飛行機</button><button class="btn" onclick="sel('love')">❤️ 恋愛</button>
-            </div>
-        </div>
-    </main>
-    <aside class="card">
-        <h2>⚙️ 設定</h2>
-        <p style="font-size:0.8rem;margin:5px 0">背景色を選択</p>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;">
-            <button class="btn" style="background:#0d1117" onclick="chg('#0d1117')">黒</button><button class="btn" style="background:#8b1e1e" onclick="chg('#8b1e1e')">赤</button>
-            <button class="btn" style="background:#1e3a8a" onclick="chg('#1e3a8a')">青</button><button class="btn" style="background:#eab308;color:#000" onclick="chg('#eab308')">黄</button>
-            <button class="btn" style="background:#166534" onclick="chg('#166534')">緑</button><button class="btn" style="background:#c2410c" onclick="chg('#c2410c')">橙</button>
-        </div>
-        <p style="font-size:0.8rem;margin:10px 0 5px">文字色</p>
-        <select id="fnt" class="input" style="width:100%" onchange="chgF(this.value)"><option value="#fff">白</option><option value="#000">黒</option></select>
-    </aside>
-    <section class="card" style="grid-column:1/-1;">
-        <h3>💬 画像付き掲示板</h3>
-        <div class="form">
-            <input type="text" id="name" class="input" placeholder="名前">
-            <textarea id="msg" class="input" rows="2" placeholder="感想や改善案を書いてね" required></textarea>
-            <label class="btn" style="text-align:center;font-size:0.9rem">📸 画像を選ぶ<input type="file" id="file" accept="image/*" style="display:none" onchange="document.getElementById('fname').innerText=this.files[0].name"></label>
-            <span id="fname" style="font-size:0.8rem;color:#8b949e;text-align:center">未選択</span>
-            <button class="btn" style="background:#238636" onclick="pub()">🚀 投稿する</button>
-        </div>
-        <div id="c-area"><p style="color:#8b949e">読み込み中...</p></div>
-    </section>
-</div>
-<script>
-const URL = "YOUR_SUPABASE_URL"; 
-const KEY = "YOUR_SUPABASE_ANON_KEY";
-const URL = "YOUR_SUPABASE_URL"; 
-const KEY = "YOUR_SUPABASE_ANON_KEY";
-const sb = window.supabase ? window.supabase.createClient(URL, KEY) : null;
-
-async function load(){
-    if(!sb)return; const {data,error} = await sb.from('comments').select('*').order('created_at',{ascending:false});
-    if(error){console.error(error);return;}
-    document.getElementById('c-area').innerHTML = data.length === 0 ? '<p style="color:#8b949e">投稿がありません</p>' : data.map(c => `
-        <div class="c-item"><div style="font-size:0.8rem;color:#8b949e;margin-bottom:4px;">👤 ${esc(c.username)} | ${new Date(c.created_at).toLocaleString()}</div>
-        <div style="white-space:pre-wrap;">${esc(c.text)}</div>${c.image_url ? `<img src="\${c.image_url}" class="c-img">`:''}</div>
-    `).join('');
-}
-async function pub(){
-    if(!sb){alert("接続設定が必要です");return;} const name = document.getElementById('name').value||"名無し"; const text = document.getElementById('msg').value; const file = document.getElementById('file').files[0];
-    if(!text){alert("コメントを入力してください");return;} let imgUrl = null;
-    if(file){
-        const path = `${Math.random().toString(36).substring(2)}.${file.name.split('.').pop()}`;
-        const {error:uErr} = await sb.storage.from('images').upload(path, file); if(uErr){alert("画像失敗:"+uErr.message);return;}
-        imgUrl = sb.storage.from('images').getPublicUrl(path).data.publicUrl;
-    }
-    const {error:iErr} = await sb.from('comments').insert([{username:name,text:text,image_url:imgUrl}]);
-    if(iErr){alert("失敗:"+iErr.message);}else{document.getElementById('msg').value="";document.getElementById('file').value="";document.getElementById('fname').innerText="未選択";load();}
-}
-function sel(cat){
-    const s = document.getElementById('scr'), t = document.getElementById('ttl'), txt = document.getElementById('txt'), o = document.getElementById('opt');
-    if(cat==='car'){ s.style.borderColor='#ff4d4d'; t.innerText='🚗 車：首都高バトル'; txt.innerText='深夜の首都高。ライバルが現れた！'; o.innerHTML=`<button class="btn" onclick="alert('ニトロ噴射！勝利！')">🔥 ニトロを使う</button><button class="btn" onclick="bak()">🔙 戻る</button>`;}
-    if(cat==='train'){ s.style.borderColor='#4da6ff'; t.innerText='🚊 電車：ダイヤ運行'; txt.innerText='3分の遅れが発生！'; o.innerHTML=`<button class="btn" onclick="alert('安全に回復運転！定時到着！')">⚡ 回復運転</button><button class="btn" onclick="bak()">🔙 戻る</button>`;}
-    if(cat==='plane'){ s.style.borderColor='#4dffb2'; t.innerText='✈️ 飛行機：悪天候着陸'; txt.innerText='突風が発生！機体が煽られた！'; o.innerHTML=`<button class="btn" onclick="alert('ゴーアラウンド！安全第一！')">⏫ 着陸をやり直す</button><button class="btn" onclick="bak()">🔙 戻る</button>`;}
-    if(cat==='love'){ s.style.borderColor='#ff4da6'; t.innerText='❤️ 恋愛：未読無視からの生還'; txt.innerText='丸1日の未読無視。どうする？'; o.innerHTML=`<button class="btn" onclick="alert('ウケる動画を送信！返信アリ！')">☕ 面白い動画を送る</button><button class="btn" onclick="bak()">🔙 戻る</button>`;}
-}
-function bak(){
-    document.getElementById('scr').style.borderColor='var(--accent-color)'; document.getElementById('ttl').innerText='🚀 メインメニュー'; document.getElementById('txt').innerText='ジャンルを選んでください';
-    document.getElementById('opt').innerHTML=`<button class="btn" onclick="sel('car')">🚗 車</button><button class="btn" onclick="sel('train')">🚊 電車</button><button class="btn" onclick="sel('plane')">✈️ 飛行機</button><button class="btn" onclick="sel('love')">❤️ 恋愛</button>`;
-}
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-window.onload=function(){load();const b=localStorage.getItem('b'),f=localStorage.getItem('f');if(b)chg(b);if(f){document.documentElement.style.setProperty('--text-color',f);document.getElementById('fnt').value=f;}};
-function chg(c){document.documentElement.style.setProperty('--bg-color',c);localStorage.setItem('b',c);}
-function chgF(c){document.documentElement.style.setProperty('--text-color',c);localStorage.setItem('f',c);}
-</script></body></html>
+<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>AI Lab</title><style>:root{--bg:#0d1117;--txt:#fff;--card:#161b22;--border:#30363d;}body{font-family:sans-serif;background:var(--bg);color:var(--txt);margin:0;}.container{max-width:900px;margin:20px auto;padding:0 15px;display:grid;grid-template-columns:1fr;gap:15px;}@media(min-width:768px){.container{grid-template-columns:2fr 1fr;}}.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:15px;}.win{background:#010409;border:2px solid #58a6ff;border-radius:6px;min-height:240px;padding:15px;text-align:center;}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:400px;margin:15px auto 0;}.btn{background:#21262d;border:1px solid var(--border);color:inherit;padding:12px;border-radius:6px;cursor:pointer;font-weight:bold;font-size:1rem;}.btn:hover{border-color:#58a6ff;background:rgba(255,255,255,0.05);}.scene{display:none;}.active{display:block;}.input{padding:8px;border-radius:4px;border:1px solid var(--border);background:#010409;color:inherit;width:100%;box-sizing:border-box;}</style></head><body>
+<header style="background:var(--card);padding:15px;text-align:center;border-bottom:1px solid var(--border);"><h1 style="margin:0;font-size:1.5rem;color:#58a6ff;">🤖 AI Simulator Lab</h1></header>
+<div class="container"><main class="card"><h2>🎮 シミュレーター</h2><div class="win">
+<div id="m" class="scene active"><h3>🚀 メインメニュー</h3><p>部門を選んでください</p><div class="grid"><button class="btn" onclick="document.getElementById('m').className='scene';document.getElementById('c').className='scene active';">🚗 車 部門</button><button class="btn" onclick="document.getElementById('m').className='scene';document.getElementById('t').className='scene active';">🚊 電車 部門</button><button class="btn" onclick="document.getElementById('m').className='scene';document.getElementById('p').className='scene active';">✈️ 飛行機 部門</button><button class="btn" onclick="document.getElementById('m').className='scene';document.getElementById('l').className='scene active';">❤️ 恋愛 部門</button></div></div>
+<div id="c" class="scene"><h3 style="color:#ff4d4d">🚗 車：首都高バトル</h3><p>ライバルが真横に並んだ！どうする？</p><div class="grid"><button class="btn" onclick="document.getElementById('c').className='scene';document.getElementById('cw').className='scene active';">🔥 ニトロ噴射</button><button class="btn" onclick="document.getElementById('c').className='scene';document.getElementById('cl').className='scene active';">🛡️ ブロック</button></div></div>
+<div id="cw" class="scene"><h3>🏁 結果：勝利！</h3><p>爆発的な加速で引き離した！</p><button class="btn" onclick="document.getElementById('cw').className='scene';document.getElementById('m').className='scene active';">🔙 戻る</button></div><div id="cl" class="scene"><h3 style="color:#ff4d4d">💥 結果：大破</h3><p>壁に激突してリタイアです。</p><button class="btn" onclick="document.getElementById('cl').className='scene';document.getElementById('m').className='scene active';">🔙 戻る</button></div>
+<div id="t" class="scene"><h3 style="color:#4da6ff">🚊 電車：過密ダイヤ</h3><p>3分の遅れが発生！どうする？</p><div class="grid"><button class="btn" onclick="document.getElementById('t').className='scene';document.getElementById('tw').className='scene active';">⚡ 回復運転</button><button class="btn" onclick="document.getElementById('t').className='scene';document.getElementById('tl').className='scene active';">🛑 停車時間を削る</button></div></div>
+<div id="tw" class="scene"><h3>🏁 結果：定時到着！</h3><p>プロの技で遅れを完璧に回復！</p><button class="btn" onclick="document.getElementById('tw').className='scene';document.getElementById('m').className='scene active';">🔙 戻る</button></div><div id="tl" class="scene"><h3 style="color:#ffaa00">⚠️ 結果：遅延拡大</h3><p>荷物が挟まり余計に遅延した。</p><button class="btn" onclick="document.getElementById('tl').className='scene';document.getElementById('m').className='scene active';">🔙 戻る</button></div>
+<div id="p" class="scene"><h3 style="color:#4dffb2">✈️ 飛行機：悪天候着陸</h3><p>突風で機体が煽られた！どうする？</p><div class="grid"><button class="btn" onclick="document.getElementById('p').className='scene';document.getElementById('pw').className='scene active';">⏫ ゴーアaround</button><button class="btn" onclick="document.getElementById('p').className='scene';document.getElementById('pl').className='scene active';">🛬 着陸強行</button></div></div>
+<div id="pw" class="scene"><h3>🏁 結果：安全退避！</h3><p>見事なゴーアラウンド判断！</p><button class="btn" onclick="document.getElementById('pw').className='scene';document.getElementById('m').className='scene active';">🔙 戻る</button></div><div id="pl" class="scene"><h3 style="color:#ff0000">🚨 結果：着陸失敗</h3><p>滑走路を逸脱し大事故に。</p><button class="btn" onclick="document.getElementById('pl').className='scene';document.getElementById('m').className='scene active';">🔙 戻る</button></div>
+<div id="l" class="scene"><h3 style="color:#ff4da6">❤️ 恋愛：未読無視</h3><p>丸1日の未読無視。どう追いLINEする？</p><div class="grid"><button class="btn" onclick="document.getElementById('l').className='scene';document.getElementById('lw').className='scene active';">☕ 面白い動画を送る</button><button class="btn" onclick="document.getElementById('l').className='scene';document.getElementById('ll').className='scene active';">🥺 寂しがるメッセージ</button></div></div>
+<div id="lw" class="scene"><h3>🏁 結果：大成功！</h3><p>「ウケる笑」と即返信が来た！</p><button class="btn" onclick="document.getElementById('lw').className='scene';document.getElementById('m').className='scene active';">🔙 戻る</button></div><div id="ll" class="scene"><h3 style="color:#777">💔 結果：ブロック</h3><p>重すぎてブロックされました。</p><button class="btn" onclick="document.getElementById('ll').className='scene';document.getElementById('m').className='scene active';">🔙 戻る</button></div>
+</div></main>
+<aside class="card"><h2>⚙️ 設定</h2><p style="font-size:0.8rem;margin:5px 0;">背景色</p><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;"><button class="btn" style="background:#0d1117" onclick="document.body.style.setProperty('--bg','#0d1117')">黒</button><button class="btn" style="background:#8b1e1e" onclick="document.body.style.setProperty('--bg','#8b1e1e')">赤</button><button class="btn" style="background:#1e3a8a" onclick="document.body.style.setProperty('--bg','#1e3a8a')">青</button><button class="btn" style="background:#eab308;color:#000" onclick="document.body.style.setProperty('--bg','#eab308')">黄</button><button class="btn" style="background:#166534" onclick="document.body.style.setProperty('--bg','#166534')">緑</button><button class="btn" style="background:#c2410c" onclick="document.body.style.setProperty('--bg','#c2410c')">橙</button></div><p style="font-size:0.8rem;margin:10px 0 5px;">文字色</p><select class="input" onchange="document.body.style.setProperty('--txt',this.value)"><option value="#fff">白</option><option value="#000">黒</option></select></aside>
+<section class="card" style="grid-column:1/-1;"><h3>💬 フィードバック掲示板</h3><div style="display:flex;flex-direction:column;gap:8px;"><input type="text" class="input" placeholder="名前"><textarea class="input" rows="2" placeholder="改善案を書いてね"></textarea><button class="btn" style="background:#238636" onclick="alert('掲示板のデータ通信は後ほど設定します！')">🚀 投稿する</button></div></section></div></body></html>
